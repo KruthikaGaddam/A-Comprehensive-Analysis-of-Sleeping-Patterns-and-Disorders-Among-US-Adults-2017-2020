@@ -1,0 +1,654 @@
+---
+title: "__A Comprehensive Analysis of Sleeping Patterns and Disorders Among US Adults, 2017–2020__"
+subtitle: "Kruthika Gaddam, Likith Sai Gowni, Kavya Gustala, Mounisha Madala, Sowmya Papagari"
+author: "INFO-B 518 Applied Statistical Methods for Biomedical Informatics"
+date: "Indiana University-Purdue University, Indianapolis, USA"
+output:
+  pdf_document: default
+  word_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, echo=FALSE}
+```
+# 1 Project Scope
+## 1.1 Introduction
+Sleep, like food, water, and oxygen, is essential to human life. The timing of 
+sleep is influenced by biological factors, as evidenced by the human tendency 
+to sleep at night. However, many factors, including education, occupation, 
+social activities, insomnia, and various sleep and medical disorders, 
+can result in individuals sleeping at varying times (Grandner, 2017, p. 1). 
+The internet has significantly changed people's personal and professional lives,
+directly or indirectly influencing the sleep cycle, such as accessing social media 
+in bed or browsing late at night (Grandner, 2017, p. 2).
+
+
+   Circadian rhythms and sleep habits are currently being altered in individuals.
+Due to various causes, they rely excessively on weekdays and weekends, negatively 
+affecting metabolic function and increasing the risk of many diseases. Because of 
+the differing sleep cycles on weekends and weekdays, a substantial percentage of 
+sleep debt is compensated on weekends. Social jetlag is the difference between weekends 
+and weekdays, as well as between social time and circadian rhythm (Roenneberg et 
+al., 2012, p. 939). For instance, the prevalence of adults who sleep less than 6 hours may have 
+increased over time in the United States, according to the minimal statistics available 
+(Ford et al., 2015, p. 829). Finding out the usual time people go to sleep and wake 
+up during the week and on weekends can help healthcare professionals understand sleep
+patterns and how they affect health. This can help promote healthy sleep habits and 
+improve the health of people in the US.
+
+## 1.2 Aim
+The aim of this study is to find out how the people of the United States sleep and 
+to evaluate the following things:
+
+1. This study will look at how long people sleep on average, when they wake up on 
+average, and how long people sleep on average on weekdays and weekends. 
+2. Determine the amount of sleep debt and social jetlag.
+3. This study aims to investigate whether individuals who maintain a consistent 
+sleep pattern throughout the week, including weekends, experience reduced daytime sleepiness.
+4. This study aims to establish a correlation between sleep duration during weekdays 
+and weekends and various factors such as snoring and snorting.
+
+## 1.3 Purpose
+This project aims to understand the US population's sleeping habits and sleep disturbances. 
+With further research, these findings could be used to assist healthcare professionals 
+understand sleep patterns and their effects on promoting healthy sleep habits and 
+improving the health of US citizens. The results of this study can be used as a basis to investigate and improve the sleep habits of the US population.
+
+## 1.4 Hypotheses
+1. Determining if the average sleep-wake time is different on weekends and weekdays.\
+ __Null hypothesis__: The average sleep-wake time is not different on weekends and weekdays.\
+__Alternate Hypothesis__: The average sleep and wake times differ on weekdays and weekends.\
+2. Determining if individuals who have regular sleep cycle is associated with lower 
+daytime sleepiness.\
+ __Null Hypothesis__: Individuals who have regular sleep cycle is not associated 
+with lower daytime sleepiness.\
+  __Alternate Hypothesis__: Individuals who have regular sleep cycle is associated 
+with lower daytime sleepiness.\
+3. Determining if sleep duration on weekdays and weekends is associated with snoring,
+snorting, trouble sleeping, or feeling over-sleepy during the day.\
+ __Null Hypothesis__: Sleep duration on weekdays and weekends has no association 
+with snoring, snorting, difficulty sleeping, or feeling sleepy during the day.\
+  __Alternate Hypothesis__: Sleep duration on weekdays and weekends has association 
+with snoring, snorting, difficulty sleeping, or feeling sleepy during the day.
+  
+# 2 Data Exploration
+## 2.1 Data collection and extraction
+The National Health and Nutrition Examination Survey (NHANES) is an annual survey 
+that gathers information on a wide range of health and nutritional issues from a nationally representative sample of the population in the United States of America. The Sleep Disorders 
+Dataset (2017-20) comprises 10,196 rows and 11 columns. This data collection contains 
+questions derived from the Munich Chrono Type Questionnaire about sleep patterns 
+and problems, such as regular sleep times on weekdays and weekends, Sleep hours, Snorting, difficulty sleeping, and feeling drowsy during the day. Participants were surveyed 
+at home using the Computer-Assisted Personal Interview (CAPI) technology. The precision and 
+comprehensiveness of the data ensured quality assurance.
+[Data set Link](https://wwwn.cdc.gov/Nchs/Nhanes/2017-2018/P_SLQ.XPT)
+
+```{r message=TRUE, warning=FALSE, include=FALSE, results='hide'}
+library(readr)
+library(knitr)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+#Loading the csv to import the data
+sleepdata = read_csv("C:\\Users\\DELL\\Downloads\\stats_squad_sleepdisorders.csv", show_col_types = FALSE)
+kable(head(sleepdata), caption =" Sleep Disorders Dataset")
+```
+
+The data cleaning and data analysis were done using RStudio. There were 0.39% missing 
+values in the dataset. According to the NHANES, missing values should only be imputed 
+if they make up more than 10% of the total observations. In this case, less than 10% 
+of the observations were missing values, so they were not imputed. In this project, the observations with missing data were omitted as they were in important variables like
+sleep time, wake time, and sleep disturbances, which would have been useless if they
+had been kept with the missing data and considered only the complete data for the important variables. The column headers were modified to enhance the understanding of the variables.
+
+
+## 2.2 Variables
+Variables include a Sequence number, weekdays sleep time, weekdays waketime, 
+weekdays sleep time, weekends sleep time, weekends wake time, weekends sleep duration, 
+Snoring frequency, Snorting, Trouble sleeping, and Excessive sleep during 
+the day which are coded as SLQ and SLD. Sequence number is discrete, 
+snoring, Snorting and oversleepy during the day are ordinal variables, Trouble 
+sleeping is a binary variable, Sleep time, wake time on weekends and week days are 
+in the time format and are continuous. Sleep duration on weekends and weekdays are 
+continuous variables. In addition other variables like Social jetlag (mid-point d
+ifference between sleep on weekdays and weekends) and sleep debt (the difference between 
+weekend sleep duration and weekly average sleep duration) will be determined 
+(Di et al., 2022, p. 2).
+
+```{r message=FALSE, warning=FALSE, include=FALSE, paged.print=FALSE, results='asis'}
+
+#omitting missing values
+sleepdf= na.omit(sleepdata)
+
+#Renaming the column names
+colnames(sleepdf)= c('SEQN', 'WD_sleeptime', 'WD_waketime', 'WD_sleephours', 'WE_sleeptime', 'WE_waketime', 'WE_sleephours', 'Snoring', 'Snorting', 'Trouble_sleep', 'Oversleepy')
+
+# Converting sleep and wake times to time format
+library(dplyr)
+sleepdf= sleepdf %>%
+  mutate(across(contains("sleeptime") | contains("waketime"), parse_time))
+
+kable(head(sleepdf), caption =" Cleaned Sleep Disorders Dataset", align = "c",  booktabs = TRUE)
+
+
+# Calculating sleep debt
+sleepdf= sleepdf %>%
+  mutate(sleep_debt = WE_sleephours - WD_sleephours)
+
+#Calculating social jetlag
+sleepdf = sleepdf %>%
+  mutate(mid_sleep_weekdays = WD_sleeptime/3600 + WD_sleephours / 2,
+         mid_sleep_weekends = WE_sleeptime/3600 + WE_sleephours / 2,
+         social_jetlag = abs(mid_sleep_weekends - mid_sleep_weekdays))
+
+```
+## 2.3 Data Distribution and Summary
+
+The summary statistics in Table 2 provide an overview of sleeping patterns. Important 
+variables include the duration of sleep on weekdays `WD_sleephours` and weekends 
+`WE_sleephours`. The minimum weekday and weekend sleep duration is 3 hours, and the 
+maximum is 14 hours. The average weekday sleep duration is 7.65 hours, with a median 
+of 7.5 hours. The interquartile range (IQR) is between 7 and 8.5 hours, representing 
+the middle 50 percent of the data. The average weekend sleep duration is 8.36 hours, 
+with the median being 8 hours as shown in Figure 2. The IQR ranges between 7 and 9.5 hours, representing the median 50% of the data set. The `Snoring` and `Snorting` variables 
+ranges from 0 (Never) to 9 (Don't know), with a median of 1 (Rarely) and a median of 0 (Never) 
+simultaneously and they both are right skewed (See Appendix). The median value of the trouble sleeping variable `trouble_sleep` is (No), ranging from 1 (Yes) to 9 (Don't know). Over-sleepy during the day variable `Oversleepy` ranges from 0 (Never) to 9 (Don't know), with a mean of 2 
+(Sometimes) and is rightly skewed. The average `sleep_debt` is 0.50 hours. Absolute
+sleep debt was calculated on weekends and weekdays by taking 8 hours as the recommended 
+sleep duration as shown in Figure 2.
+
+```{r, echo=FALSE, results='asis'}
+
+# summary statistics 
+vari = c("WD_sleephours", "WE_sleephours", "Snoring", "Snorting", "Trouble_sleep", "Oversleepy", "sleep_debt")
+summary_stats <- sapply(sleepdf[vari], summary)
+kable(head(summary_stats), caption =" Descriptive Statistics", align = "c",  booktabs = TRUE)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, include=FALSE, paged.print=FALSE, results='asis'}
+#MEAN SLEEP HOURS
+#Mean sleephours on weekdays
+weekday_mean = mean(sleepdf$WD_sleephours)
+weekday_sd = sd(sleepdf$WD_sleephours)
+weekday_n = length(sleepdf$WD_sleephours)
+
+# Calculating the standard error
+weekday_se = weekday_sd / sqrt(weekday_n)
+
+# Calculating the 95% confidence interval using the t-distribution
+alpha = 0.05
+t_critical = qt(1 - alpha/2, df = weekday_n - 1)
+weekday_conf_int = c(weekday_mean - t_critical * weekday_se, weekday_mean + t_critical * weekday_se)
+
+weekday_mean
+weekday_conf_int
+
+
+#Mean sleephours on weekends
+weekend_mean = mean(sleepdf$WE_sleephours)
+weekend_sd = sd(sleepdf$WE_sleephours)
+weekend_n = length(sleepdf$WE_sleephours)
+
+# Calculating the standard error
+weekend_se = weekend_sd / sqrt(weekend_n)
+
+# Calculating the 95% confidence interval using the t-distribution
+alpha = 0.05
+t_critical = qt(1 - alpha/2, df = weekend_n - 1)
+weekend_conf_int = c(weekend_mean - t_critical * weekend_se, weekend_mean +
+                       t_critical * weekend_se)
+
+weekend_mean
+weekend_conf_int
+
+#Difference between the sleep duration on weekdays and weekends
+Sleepdifference = abs(weekday_mean- weekend_mean)
+Sleepdifference
+```
+
+
+```{r fig1, fig.width = 6, fig.asp = .62, echo=FALSE,  results='asis',fig.cap="Distribution of sleep hours" }
+
+## Creating the histograms
+# Set up the plotting layout
+par(mfrow = c(1, 2))
+hist(sleepdf$WD_sleephours, main = "Weekday Sleep Duration", xlab = "Sleep Duration (hours)", ylab = "Frequency", col = "lightcoral", breaks = 20)
+hist(sleepdf$WE_sleephours, main = "Weekend Sleep Duration", xlab = "Sleep Duration (hours)", ylab = "Frequency", col = "steelblue", breaks = 20)
+```
+
+```{r message=FALSE, warning=FALSE, include=FALSE, paged.print=FALSE, results='asis'}
+#MEAN WAKE TIME
+#Mean waketime on weekdays
+
+# Function to convert time objects to seconds
+time_to_seconds = function(time) {as.numeric(time, units = "secs")}
+
+# Function to convert seconds to time format (hours, minutes, and seconds)
+seconds_to_time = function(seconds) {
+  hours = as.integer(floor(seconds / 3600))
+  minutes = as.integer(floor((seconds %% 3600) / 60))
+  seconds = as.integer(seconds %% 60)
+  sprintf("%02d:%02d:%02d", hours, minutes, seconds)}
+
+sleepdf$WD_waketime_secs = time_to_seconds(sleepdf$WD_waketime)
+mean_waketime_weekdays = mean(sleepdf$WD_waketime_secs)
+CI_weekdays_waketime = t.test(sleepdf$WD_waketime_secs, conf.level = 0.95)$conf.int
+
+seconds_to_time(mean_waketime_weekdays)
+seconds_to_time(CI_weekdays_waketime)
+
+
+#Mean waketime on weekends
+sleepdf$WE_waketime_secs = time_to_seconds(sleepdf$WE_waketime)
+mean_waketime_weekends = mean(sleepdf$WE_waketime_secs)
+CI_weekends_waketime = t.test(sleepdf$WE_waketime_secs, conf.level = 0.95)$conf.int
+
+seconds_to_time(mean_waketime_weekends)
+seconds_to_time(CI_weekends_waketime)
+
+#Difference between the waketime on weekdays and weekends
+waketimedifference = seconds_to_time(mean_waketime_weekends-mean_waketime_weekdays)
+waketimedifference
+
+#MEAN SLEEP TIME
+#Mean sleeptime on weekdays
+
+sleepdf$WD_sleeptime_secs = time_to_seconds(sleepdf$WD_sleeptime)
+mean_sleeptime_weekdays = mean(sleepdf$WD_sleeptime_secs)
+CI_weekdays_sleeptime = t.test(sleepdf$WD_sleeptime_secs, conf.level = 0.95)$conf.int
+
+seconds_to_time(mean_sleeptime_weekdays)
+seconds_to_time(CI_weekdays_sleeptime)
+
+#Mean sleeptime on weekends
+sleepdf$WE_sleeptime_secs = time_to_seconds(sleepdf$WE_sleeptime)
+mean_sleeptime_weekends = mean(sleepdf$WE_sleeptime_secs)
+CI_weekends_sleeptime = t.test(sleepdf$WE_sleeptime_secs, conf.level = 0.95)$conf.int
+
+seconds_to_time(mean_sleeptime_weekends)
+seconds_to_time(CI_weekends_sleeptime)
+
+#Difference between the waketime on weekdays and weekends
+sleeptimedifference = seconds_to_time(mean_sleeptime_weekends-mean_sleeptime_weekdays)
+sleeptimedifference
+
+#Mean Social jetlag
+socialjetlag_mean = mean(sleepdf$social_jetlag)
+mean_social_jetlag_hours <- mean(sleepdf$social_jetlag) / 3600
+socialjetlag_sd = sd(sleepdf$social_jetlag)
+socialjetlag_n = length(sleepdf$social_jetlag)
+
+# Calculating the standard error
+socialjetlag_se = socialjetlag_sd / sqrt(socialjetlag_n)
+
+# Calculating the 95% confidence interval using the t-distribution
+alpha = 0.05
+t_critical = qt(1 - alpha/2, df = socialjetlag_n - 1)
+socialjetlag_conf_int = c(socialjetlag_mean - t_critical * socialjetlag_se, socialjetlag_mean +
+                       t_critical * socialjetlag_se)
+
+socialjetlag_mean
+socialjetlag_conf_int
+
+
+#Mean Sleep debt
+
+mean_sleep_debt = mean(sleepdf$sleep_debt)
+se_sleep_debt = sd(sleepdf$sleep_debt) / sqrt(nrow(sleepdf))
+
+# Calculate the 95% confidence interval for sleep debt
+CI_sleep_debt = c(mean_sleep_debt - qt(0.975, df = nrow(sleepdf) - 1) * se_sleep_debt,
+                   mean_sleep_debt + qt(0.975, df = nrow(sleepdf) - 1) * se_sleep_debt)
+
+mean_sleep_debt
+CI_sleep_debt
+```
+
+```{r fig2, fig.width = 8, fig.asp = .62, echo=FALSE,  results='asis', fig.cap="Sleep debt compared to recommended 8 hours of sleep"}
+
+# Define the recommended sleep duration (in hours)
+recommended_sleep_duration = 8
+
+# Calculate the absolute sleep debt for weekdays and weekends (in hours)
+sleepdf = sleepdf %>%
+  mutate(abs_sleep_debt_weekdays = ifelse(WD_sleephours / 60 < recommended_sleep_duration, recommended_sleep_duration - (WD_sleephours / 60), 0),
+         abs_sleep_debt_weekends = ifelse(WE_sleephours / 60 < recommended_sleep_duration, recommended_sleep_duration - (WE_sleephours / 60), 0))
+
+# Plot the absolute sleep debt for weekdays and weekends (in hours)
+par(mfrow = c(1, 2))
+
+hist(sleepdf$abs_sleep_debt_weekdays, main = "Absolute Sleep Debt on Weekdays", xlab = "Sleep Debt (hours)", col = "aquamarine3", breaks = 20)
+hist(sleepdf$abs_sleep_debt_weekends,main = "Absolute Sleep Debt on Weekdays", xlab = "Sleep Debt (hours)", col = "aquamarine4", breaks = 20)
+```
+
+# 3 Statistical Methods
+## Exploratory Data Analysis
+
+Individuals who wake up at the same time on weekdays and weekends and get the same 
+amount of sleep on both days are investigated to see if a regular sleep cycle reduces 
+daytime sleepiness. To find the correlation, the ANOVA will compare the groups with 
+and without a healthy sleep cycle. Given that the assumption of homogeneity of variance 
+is not met for variance analysis, the Kruskal-Wallis test is utilized as a non-parametric alternative. The Kruskal-Wallis test indicates no significant difference in daytime 
+`Oversleepy` between those with and without regular sleep cycles (p-value = 0.6854). 
+Therefore, maintaining a regular sleep cycle does not significantly impact daytime 
+sleepiness. As the chi-square is less for Kruskal-Wallis this forms one of the 
+limitations of this statistical test. 
+
+To determine the multiple linear regression, log transformation was done on `Snoring,` and multiple linear regression was done using variables like sleep debt, trouble sleeping, and over-sleepiness as multicollinearity was determined for them. The adjusted R square was 
+determined by testing different models, and the adjusted r square for `WD_sleephours` 
+was 18%, and for`WE_sleephours`, it was 30%, determining the best fit for the model. 
+Outliers were also determined, but as the project deals with self-reported data, the 
+outliers were not excluded from the dataset as they might also give important information. 
+Robust regression was done to address the presence of outliers or influential points. 
+For the robust regression, the residual error was less when compared to multiple linear regression,but the adjusted R square was low when compared to multiple linear models.
+One of the limitations of this is the adjusted R square was less than the models. 
+The normal Q-Q plots were plotted (See Figure 3), which slightly deviated from the 
+normal, but as the population size is large, this was not considered.
+
+For the logistic regression, a correlation heatmap was plotted to determine the highly 
+associated factors. For the logistic regression, the binary variable `Trouble_sleep` 
+was plotted against other independent variables, and the most association was found 
+between `Oversleepy`, `Snoring`, and `Snorting`. The multiple logistic regression's 
+independent variables were all categorical, so they were converted to factors to yield a 
+best-fitting model. For this AIC value was 10726, which 
+was best fitting when compared to other models.
+
+## Limitations encountered during the project
+1. As the data was self-reported, the outliers could not be removed, which might have significantly affected the data.
+2. As the data was in time series, it was difficult to determine the exact sleep times 
+as the meantime could not be exactly determined.
+3. As the data were not normally distributed, ANOVA could not be tested to determine the 
+mean across groups, and Kruskal-Wallis yielded a low chi-square value. 
+4. The multiple linear regression yielded less adjusted R square for `WD_sleephours`, 
+which might indicate certain missing data or other factors which are not associated with it.
+5. The multiple logistic regression yielded high AIC due to the large sample size.
+
+
+
+```{r fig3, fig.width = 7, fig.asp = .62, echo=FALSE,  results='asis', fig.cap="Normal Q-Q plots"}
+# Convert Snoringto numeric (hours) and apply log transformation
+sleepdf$log_Snoring <- log(sleepdf$Snoring + 1)
+# For WD_sleephours model
+wd_model <- lm(formula = WD_sleephours ~ log_Snoring + sleep_debt + Trouble_sleep + Oversleepy, data = sleepdf)
+
+# For WE_sleephours model
+we_model <- lm(formula = WE_sleephours ~ log_Snoring + sleep_debt + Trouble_sleep + Oversleepy, data = sleepdf)
+
+# Custom Q-Q plot function
+custom_qq_plot <- function(model, main_title, plot_color) {
+  qqnorm(rstandard(model), main = main_title, col = plot_color, pch = 16)
+  qqline(rstandard(model), col = "grey")
+}
+
+# Set up the plotting area with 1 row and 2 columns
+par(mfrow = c(1, 2))
+
+# Call the custom_qq_plot function to create the Q-Q plots for WD_sleephours and WE_sleephours
+custom_qq_plot(wd_model, "WD_sleephours: Normal Q-Q", plot_color = "lightblue")
+custom_qq_plot(we_model, "WE_sleephours: Normal Q-Q", plot_color = "navyblue")
+
+# Reset the plotting area to the default single panel
+par(mfrow = c(1, 1))
+
+```
+
+# 4 Results
+In the US population from 2017 to 2021, the mean sleep duration on weekdays was 7.65 
+hours (95% CI, 7.62-7.69 hours). The mean sleep duration on weekends was 8.36 hours 
+(95% CI, 8.32-8.40 hours). The difference between weekday and weekend sleep duration was 0.70 hours. It indicated that individuals slept more on weekends than on weekdays. Sleep 
+and wake times were also differed among the US population. The mean wake time on weekdays 
+was 06:44:51 hours (95% CI, 06:42:10- 06:42:10 hours). The mean wake time on 
+weekends was 07:52:34 hours (95% CI, 07:50:01-07:55:08 hours). The difference between  
+wake times on weekdays and weekends was 01:07:43 hours.The mean sleep time on weekends 
+and weekdays is 12:00 AM. The mean sleep debt was 0.50 hours (95% CI, 0.48-0.53 hours). 
+The Kruskal-Wallis test was performed to determine whether individuals with regular sleep 
+cycles also experience excessive daytime sleepiness. The p-value of 0.6851 indicates that 
+there was no statistically significant difference in the distribution of Oversleepy scores 
+between those with regular sleep cycles and those without, so failing to reject the null hypothesis where regular sleep cycle is [regular_sleep_cycle = (Weekday_waketime == Weekend_waketime) & (Weekday_sleephours == Weekend_sleephours)].
+
+The multiple linear regression was done on between the dependent variable of weekday
+sleep hours and several independent variables, including log-transformed snoring, 
+sleep debt, trouble sleeping, and over-sleepiness. The statistical analysis reveals 
+that the model as a whole is statistically significant (F-statistic = 538.3, p < 2.2e-16). Moreover, the adjusted R-squared value suggests that the explanatory variables account 
+for approximately 18% of the variability in the response variable. The regression 
+analysis reveals that the variable of snoring, which has been subjected to log transformation, exhibits a negative coefficient of -0.17192. This suggests an inverse relationship 
+exists between the level of snoring and the number of hours of sleep during weekdays, 
+whereby an increase in snoring is associated with a decrease in weekday sleep hours. 
+The findings reveal a negative correlation between sleep debt and weekday sleep hours, as evidenced by the negative coefficient value of -0.57194. This suggests that an increase 
+in sleep debt is associated with a decrease in the number of hours slept during weekdays. 
+The coefficient for trouble_sleep is positively significant (0.15174), implying that an 
+increase in the difficulty level is associated with an increase in the number of hours
+of sleep during weekdays. The variable Oversleepy exhibits a negative coefficient value of -0.05041, which suggests an inverse relationship between the degree of over sleepiness
+and the duration of sleep hours on weekdays. Another multiple linear regression was 
+done on Weekend sleephours and log-transformed snoring, sleep debt, trouble sleeping, 
+and over-sleepiness which resulted in Multiple R-squared:0.3071, Adjusted R-squared: 0.3068 indicating a best fitting model when compared to others.
+
+After performing the correlation for the binary variable `Trouble_sleep` to other 
+variables like `Oversleepy`, `Snoring`, `Snorting`, `sleep_debt`, `WD_sleephours` and `WE_sleephours`. The correlation was found for `Trouble_sleep`, `Oversleepy`, `Snoring`, `Snorting` and multiple logistic regression was performed which yielded. The findings 
+indicate that with the exception of Oversleepy9 and Snoring1, all predictor variables 
+demonstrated statistical significance in predicting trouble_sleep. The study reported 
+the odds ratio for each level of the predictor variables along with their corresponding 
+p-values. The adequacy of the model fit was evaluated by means of the deviance residuals 
+and the AIC value which is 10726. The adequacy of the model was demonstrated by the
+residual deviance being less than the null deviance, and the AIC value being comparatively 
+low when compared to other models.The results indicate that trouble sleeping is associated
+with snoring, snorting, and excessive sleepiness during the day.
+
+# 5 Strengths and Limitations of the project
+One of the project's strengths is that it is based on a significant and diverse 
+population. There are, however, several limitations to consider. 
+Firstly, the study depends on self-reported sleep data, which is prone to memory 
+bias because individuals may not remember their sleep periods precisely, resulting 
+in misinterpretation of results. Second, missing data were eliminated from the study, 
+which may have resulted in the loss of crucial information. However, keeping it may 
+not have improved results in this context.
+
+   Furthermore, the study may not have considered all confounding factors that could 
+influence sleep deprivation, such as profession, age, gender, and multiple disorders. 
+Including these characteristics could provide a complete knowledge of people's sleeping
+habits. Finally, because the data format for sleep timings (hh: mm) may not accurately 
+reflect the sleep duration or the precise sleep and wake times, it may have contributed
+to the misinterpretation of the results.
+
+  Despite these limitations, the study provides valuable information about sleep patterns
+and factors influencing sleep quality. Future studies could overcome these limitations
+by including more diverse factors, upgrading data collection methods, and analyzing 
+the data using better statistical methods.
+
+# 6 Conclusion
+The project found significant disparities in sleep habits between weekdays and 
+weekends among the US population. The results indicated that individuals tend to 
+sleep longer on weekends than during the week, which is consistent with the notion 
+of "sleep debt." Another important finding was the presence of social jet lag, 
+which suggests that social jet lag is a prevalent phenomenon among the US population, 
+with potentially detrimental effects on health and well-being. This research has 
+significant implications for comprehending sleep patterns and their effects on health. 
+Healthcare professionals can devise targeted interventions to promote healthy sleep 
+habits and reduce the risk of sleep-related disorders by identifying weekday and 
+weekend sleep differences. In addition, this project's findings can be used to 
+investigate other factors that may contribute to sleep deprivation, such as shift 
+work and stress, and to develop individualized strategies to improve sleep patterns 
+among the US population.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# References
+Di, H., Guo, Y., Daghlas, I., Wang, L., Liu, G., Pan, A., Liu, L., & Shan, Z. (2022). Evaluation of sleep habits and disturbances among US adults, 2017-2020. JAMA network open, 5(11), e2240788-e2240788. https://doi.org/10.1001/jamanetworkopen.2022.40788 \
+
+Ford, E. S., Cunningham, T. J., & Croft, J. B. (2015). Trends in self-reported sleep duration among US adults from 1985 to 2012. Sleep, 38(5), 829-832. https://doi.org/10.5665/sleep.4684 \
+
+Grandner, M. A. (2017). Sleep, health, and society. Sleep medicine clinics, 12(1), 1-22. https://doi.org/10.1016/j.jsmc.2016.10.012 \
+
+Roenneberg, T., Allebrandt, Karla V., Merrow, M., & Vetter, C. (2012). Social jetlag and obesity. Current Biology, 22(10), 939-943. https://doi.org/10.1016/j.cub.2012.03.038 
+
+
+
+# Appendix
+```{r fig.width = 5, fig.asp = .62,echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE, results='asis'}
+##Plotting sleep duration graphs
+
+# Creating the bar graph
+#Loading the required library
+library(ggplot2)
+# Creating a data frame for the means
+mean_sleep_data = data.frame(
+  Sleep = c("Weekdays", "Weekends"),
+  MeanSleepDuration = c(weekday_mean, weekend_mean))
+
+ggplot(mean_sleep_data, aes(x = Sleep, y = MeanSleepDuration)) +
+  geom_bar(stat = "identity", fill = "darkseagreen3") +
+  geom_text(aes(label = round(MeanSleepDuration, 2)), vjust = -0.5, size = 4) +
+  ylim(0, max(mean_sleep_data$MeanSleepDuration) * 1.2) +
+  labs(title = "Mean Sleep Duration", x = "Sleep", y = "Mean Sleep Duration (hours)") +
+  theme_minimal()
+```
+
+```{r fig.width = 5, fig.asp = .62, echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE, results='asis'}
+# Load the ggplot2 package
+library(ggplot2)
+
+# Create a temporary variable for the purpose of the plot
+sleepdf_temp <- sleepdf %>%
+  mutate(Snoring_labels = factor(Snoring, levels = c(0, 1, 2, 3, 7, 9),
+                                 labels = c("Never", "Rarely", "Occasionally", "Frequently", "Refused", "Don't know")))
+
+# Create a bar plot using ggplot2
+ggplot(sleepdf_temp, aes(x = Snoring_labels)) +
+  geom_bar(fill = "rosybrown1") +
+  labs(title = "Snoring Frequency",
+       x = "Snoring Scale",
+       y = "Frequency") +
+  theme_minimal()
+```
+
+```{r fig.width = 6, fig.asp = .75, echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE, results='asis'}
+# Create a temporary variable for the purpose of the plot
+sleepdf_temp_snorting <- sleepdf %>%
+  mutate(Snorting_labels = factor(Snorting, levels = c(0, 1, 2, 3, 7, 9),
+                                 labels = c("Never", "Rarely", "Occasionally", "Frequently", "Refused", "Don't know")))
+
+# Create a bar plot using ggplot2
+ggplot(sleepdf_temp_snorting, aes(x = Snorting_labels)) +
+  geom_bar(fill = "lightblue") +
+  labs(title = "Snorting Frequency",
+       x = "Snorting Scale",
+       y = "Frequency") +
+  theme_minimal()
+
+# Create a temporary variable for the purpose of the plot
+sleepdf_temp_oversleepy <- sleepdf %>%
+  mutate(Oversleepy_labels = factor(Oversleepy, levels = c(0, 1, 2, 3, 4, 7, 9),
+                                  labels = c("Never", "Rarely", "Sometimes", "Often", "Almost always", "Refused", "Don't know")))
+
+# Create a bar plot using ggplot2
+ggplot(sleepdf_temp_oversleepy, aes(x = Oversleepy_labels)) +
+  geom_bar(fill = "palegreen2") +
+  labs(title = "Oversleepy Frequency",
+       x = "Oversleepy Scale",
+       y = "Frequency") +
+  theme_minimal()
+
+#For trouble sleep
+count_table <- table(sleepdf$Trouble_sleep)
+
+# Create a bar plot for the Trouble_sleep variable
+barplot(count_table, main = "Trouble Sleeping Distribution", xlab = "Category", ylab = "Frequency", names.arg = c("Yes", "No", "Refused", "Don't know"), col = "plum")
+```
+
+```{r echo=FALSE,  message=FALSE, warning=FALSE, paged.print=FALSE}
+# Identifying individuals with regular sleep cycles
+sleepdf = sleepdf %>%
+  mutate(regular_sleep_cycle = (WD_waketime == WE_waketime) & (WD_sleephours == WE_sleephours))
+
+# Kruskal-Wallis test
+kruskal_wallis_result <- kruskal.test(Oversleepy ~ regular_sleep_cycle, data = sleepdf)
+cat("kruskal_wallis test for regular sleep cycle and oversleepy:\n\n")
+kruskal_wallis_result
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+# Convert Snoringto numeric (hours) and apply log transformation
+sleepdf$log_Snoring <- log(sleepdf$Snoring + 1)
+
+
+## Fit a new multiple linear regression model with transformed variables
+log_transformed_model_WD <- lm(WD_sleephours ~ log_Snoring  + sleep_debt + Trouble_sleep+ Oversleepy, data = sleepdf)
+cat("Multiple Linear Regression for weekdays:\n\n")
+summary(log_transformed_model_WD)
+
+```
+
+```{r, echo= FALSE, message=FALSE, warning=FALSE, paged.print=TRUE}
+log_transformed_model_WE <- lm(WE_sleephours ~ log_Snoring  + sleep_debt + Trouble_sleep+ Oversleepy, data = sleepdf)
+cat("Multiple Linear Regression for weekends:\n\n")
+summary(log_transformed_model_WE)
+```
+
+```{r, echo= FALSE, message=FALSE, warning=FALSE, paged.print=TRUE}
+# Residuals vs Fitted
+par(mfrow = c(2, 2))
+custom_residuals_vs_fitted <- function(model, main_title) {
+  plot(model$fitted.values, rstandard(model),
+       main = main_title,
+       xlab = "Fitted Values",
+       ylab = "Standardized Residuals",
+       col = "lightblue",
+       pch = 16)
+  abline(h = 0, lty = 2, col = "gray") # Add a dashed line at y = 0
+}
+
+# Call the custom_residuals_vs_fitted function to create the plot for WD_sleephours
+custom_residuals_vs_fitted(log_transformed_model_WD, "WD_sleephours: Residuals vs Fitted")
+
+# Call the custom_residuals_vs_fitted function to create the plot for WD_sleephours
+custom_residuals_vs_fitted(log_transformed_model_WE, "WD_sleephours: Residuals vs Fitted")
+```
+
+```{r echo=FALSE,  results='asis', fig.cap="Correlation plot"}
+
+
+# Create a new binary variable based on the Trouble_sleep variable
+sleepdf$binary_trouble_sleep <- ifelse(sleepdf$Trouble_sleep == 1, 1, 0)
+
+# Remove rows with "refused" (7) or "don't know" (9)
+clean_sleepdf <- sleepdf[sleepdf$Trouble_sleep %in% c(1, 2), ]
+
+
+# Create a correlation matrix
+cor_matrix <- cor(clean_sleepdf[, c("binary_trouble_sleep", "Oversleepy", "Snoring", "Snorting", "sleep_debt", "WD_sleephours", "WE_sleephours")])
+```
+
+
+
+```{r echo= FALSE, message=FALSE, warning=FALSE}
+# Convert Oversleepy and Snoring to factors
+clean_sleepdf$Oversleepy <- as.factor(clean_sleepdf$Oversleepy)
+clean_sleepdf$Snoring <- as.factor(clean_sleepdf$Snoring)
+clean_sleepdf$Snorting <- as.factor(clean_sleepdf$Snorting)
+
+# Run the logistic regression model
+logistic_model_factors <- glm(binary_trouble_sleep ~ Oversleepy + Snoring + Snorting, family = binomial, data = clean_sleepdf)
+
+# Display the summary of the model
+cat("Multiple Logistic Regression:\n\n")
+summary(logistic_model_factors) 
+```
