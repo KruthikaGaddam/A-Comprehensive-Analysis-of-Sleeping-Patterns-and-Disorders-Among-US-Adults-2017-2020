@@ -10,11 +10,11 @@ This project explores sleep patterns and common sleep disorders among U.S. adult
 
 ## 📊 Key Findings
 
-1. 📈 **Identified average sleep debt of 0.5 hours**, with most individuals sleeping **~7.6 hrs on weekdays vs. ~8.3 hrs on weekends**, revealing clear behavioral compensation patterns.
+📈 **Identified average sleep debt of 0.5 hours**, with most individuals sleeping **~7.6 hrs on weekdays vs. ~8.3 hrs on weekends**, revealing clear behavioral compensation patterns.
 
-2. 🕒 **Detected over 1 hour of social jetlag** (difference in average wake time), supporting previous research linking inconsistent sleep cycles to health risks.
+🕒 **Detected over 1 hour of social jetlag** (difference in average wake time), supporting previous research linking inconsistent sleep cycles to health risks.
 
-3. 📉 **Multiple logistic regression showed significant association** between trouble sleeping and factors like **snoring, snorting**, and **excessive daytime sleepiness** — pointing to critical symptoms healthcare providers can monitor.
+🔍 **Multiple logistic regression showed significant association** between trouble sleeping and factors like **snoring, snorting**, and **excessive daytime sleepiness** — pointing to critical symptoms healthcare providers can monitor.
 
 ## 🧰 Tools & Methods
 
